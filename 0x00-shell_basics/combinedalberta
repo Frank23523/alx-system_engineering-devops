@@ -1,0 +1,30 @@
+#!/bin/bash
+pwd
+#!/bin/bash
+ls
+#!/bin/bash
+cd ~
+#!/bin/bash
+ls -l
+#!/bin/bash
+ls -al
+#!/bin/bash
+ls -al
+#!/bin/bash
+mkdir /tmp/my_first_directory/
+#!/bin/bash
+mv /tmp/betty /tmp/my_first_directory/betty
+#!/bin/bash
+rm /tmp/my_first_directory/betty
+#!/bin/bash
+rm -rf /tmp/my_first_directory
+#!/bin/bash
+cd -
+#!/bin/bash
+ls -la . .. /boot
+#!/bin/bash
+file /tmp/iamafile
+#!/bin/bash
+ln -s /bin/ls __ls__
+#!/bin/bash
+cp -u *.html ..
