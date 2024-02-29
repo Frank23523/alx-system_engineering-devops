@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# This script displays all acive IPv4 IPs on the machine it’s executed on
+
+ip addr show | grep -Eo "inet (addr:)?([0-9]*\.){3}[0-9]*" | cut -d ' ' -f 2
