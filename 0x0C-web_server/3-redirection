@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# 1-install_nginx_web_server
+
+echo -e "Updating package lists and installing Nginx...\n"
+sudo apt-get update -y -qq && sudo apt-get install nginx -y
+
+echo -e "Setting up Nginx and firewall...\n"
+sudo service nginx start
+sudo ufw allow 'Nginx HTTP'
+
+echo -e "Configuring website files...\n"
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chown -R 755 /var/www
+
+cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bak
+
+echo "Hello World!" | sudo tee /var/www/html/index.html >/dev/null
+
+sudo sed -i '24i\       rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+
+sudo service nginx restart
+
+echo -e "Nginx installation and configuration completed successfully!\n"
