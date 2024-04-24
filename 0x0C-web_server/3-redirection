@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 1-install_nginx_web_server
+# 3-redirection
 
 echo -e "Updating package lists and installing Nginx...\n"
 sudo apt-get update -y -qq && sudo apt-get install nginx -y
