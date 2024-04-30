@@ -41,6 +41,6 @@ sudo sed -i '/^}/i \    location /redirect_me {\n        return 301 https://www.
 echo "Ceci n'est pas une page" | sudo tee /var/www/html/error_404.html >/dev/null
 sudo sed -i '/server_name _;/a \    location = /error_404.html {\n        root /var/www/html;\n    }' /etc/nginx/sites-available/default
 
-sudo systemctl restart nginx
+sudo service nginx restart
 
 echo -e "Nginx installation and configuration completed successfully!\n"
