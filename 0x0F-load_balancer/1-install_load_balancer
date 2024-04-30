@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# install_load_balancer
+
+echo -e "Updating package lists and installing haproxy...\n"
+sudo apt-get update -y
+sudo apt-get install -y haproxy
+
+echo -e "Setting up haproxy...\n"
+
+sudo cp /etc/haproxy/haproxy.cfg haproxy_default.backup
+
+server_config=\
+"
+defaults
+  mode http
+  timeout client 15s
+  timeout connect 10s
+  timeout server 15s
+  timeout http-request 10s
+
+frontend devratty-tech-frontend
+    bind *:80
+    default_backend devratty-tech-backend
+
+backend devratty-tech-backend
+    balance roundrobin
+    server 530353-web-01 35.168.1.49:80 check
+    server 530353-web-02 35.175.128.209:80 check
+"
+
+echo "$server_config" | sudo dd status=none of=/etc/haproxy/haproxy.cfg
+
+echo "ENABLED=1" | sudo dd status=none of=/etc/default/haproxy
+
+echo "Done configuring Roundrobin on both servers"
+
+if [ "$(pgrep -c haproxy)" -le 0 ]; then
+	sudo service haproxy start
+else
+	sudo service haproxy restart
+fi
