@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-# duplicate web-01 to web-02
-# these scripts are an upgrade from the web-server scripts...
-
-# uncomment to see the script run in action
-#set -x
-
+# Custom_http_response_header
 echo -e "Updating package lists and installing Nginx...\n"
 sudo apt-get update -y -qq && sudo apt-get install nginx -y
 
