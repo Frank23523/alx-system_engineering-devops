@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# duplicate web-01 to web-02
+# these scripts are an upgrade from the web-server scripts...
+
+# uncomment to see the script run in action
+#set -x
 
 echo -e "Updating package lists and installing Nginx...\n"
 sudo apt-get update -y -qq && sudo apt-get install nginx -y
@@ -8,39 +13,55 @@ sudo systemctl start nginx
 sudo ufw allow 'Nginx HTTP'
 
 echo -e "Configuring website files...\n"
-sudo chown -R "$USER":"$USER" /var/www/html
-sudo chmod -R 755 /var/www
+if [ -d "/var/www" ]; then
+	sudo chown -R "$USER":"$USER" /var/www
+	sudo chmod -R 755 /var/www
+else
+	sudo mkdir -p /var/www
+	sudo chown -R "$USER":"$USER" /var/www
+	sudo chmod -R 755 /var/www
+fi
 
-# Add custom HTTP response header configuration
-server_config="
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    root /var/www/html;
-    index index.html index.htm index.nginx-debian.html;
-    server_name _;
-    location / {
-        try_files \$uri \$uri/ =404;
-        add_header X-Served-By \$hostname;  # Move add_header directive here
-    }
-}"
-
-# Replace the server configuration in the default file with the modified configuration
-echo "$server_config" | sudo tee /etc/nginx/sites-enabled/default >/dev/null
-
-# Backup the default HTML file
-sudo cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bak
+for dir in /var/www/{html,error}; do
+	if ! [ -d "$dir" ]; then
+		mkdir -p "$dir"
+	fi
+done
 
 # Create a custom HTML file
 echo "Hello World!" | sudo tee /var/www/html/index.html >/dev/null
 
-# Configure redirection
-sudo sed -i '/^}/i \    location /redirect_me {\n        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n    }' /etc/nginx/sites-available/default
-
 # Create a custom 404 error page
 echo "Ceci n'est pas une page" | sudo tee /var/www/html/error_404.html >/dev/null
-sudo sed -i '/server_name _;/a \    location = /error_404.html {\n        root /var/www/html;\n    }' /etc/nginx/sites-available/default
 
-sudo service nginx restart
+# backup the default file
+sudo cp /etc/nginx/sites-enabled/default nginx-sites-enabled_default.backup
 
-echo -e "Nginx installation and configuration completed successfully!\n"
+server_config=\
+"server {
+		listen 80 default_server;
+		listen [::]:80 default_server;
+		root /var/www/html;
+		index index.html index.htm index.nginx-debian.html
+		server_name_;
+		add_header X-Served-By \$hostname;
+		location / {
+			try_files \$uri \$uri/ =404;
+		}
+		if (\$request_filename ~ redirect_me){
+			rewrite ^ https://th3-gr00t.tk/ permanent;
+		}
+		error_page 404 /error_404.html;
+		location = /error_404.html {
+			internal;
+		}
+}"
+
+#shellcheck disable=SC2154
+echo "$server_config" | sudo dd status=none of=/etc/nginx/sites-enabled/default
+
+if [ "$(pgrep -c nginx)" -le 0 ]; then
+	sudo service nginx start
+else
+	sudo service nginx restart
+fi
