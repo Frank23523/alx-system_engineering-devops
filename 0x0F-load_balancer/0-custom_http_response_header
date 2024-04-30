@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+echo -e "Updating package lists and installing Nginx...\n"
+sudo apt-get update -y -qq && sudo apt-get install nginx -y
+
+echo -e "Setting up Nginx and firewall...\n"
+sudo systemctl start nginx
+sudo ufw allow 'Nginx HTTP'
+
+echo -e "Configuring website files...\n"
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chmod -R 755 /var/www
+
+# Add custom HTTP response header configuration
+server_config="
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    server_name _;
+    location / {
+        try_files \$uri \$uri/ =404;
+        add_header X-Served-By \$hostname;  # Move add_header directive here
+    }
+}"
+
+# Replace the server configuration in the default file with the modified configuration
+echo "$server_config" | sudo tee /etc/nginx/sites-enabled/default >/dev/null
+
+# Backup the default HTML file
+sudo cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bak
+
+# Create a custom HTML file
+echo "Hello World!" | sudo tee /var/www/html/index.html >/dev/null
+
+# Configure redirection
+sudo sed -i '/^}/i \    location /redirect_me {\n        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n    }' /etc/nginx/sites-available/default
+
+# Create a custom 404 error page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/error_404.html >/dev/null
+sudo sed -i '/server_name _;/a \    location = /error_404.html {\n        root /var/www/html;\n    }' /etc/nginx/sites-available/default
+
+sudo systemctl restart nginx
+
+echo -e "Nginx installation and configuration completed successfully!\n"
