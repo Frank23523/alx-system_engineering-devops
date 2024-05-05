@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 # Fix bug in nginx configuration
-
 ln -af /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-#restart nginx
-service nginx restart
-#stop first nginx process
+service nginx start
 kill "$(pgrep 'nginx' | head -1)"
