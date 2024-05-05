@@ -2,5 +2,7 @@
 # Fix bug in nginx configuration
 
 ln -af /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-service nginx start
+#restart nginx
+service nginx restart
+#stop first nginx process
 kill "$(pgrep 'nginx' | head -1)"
