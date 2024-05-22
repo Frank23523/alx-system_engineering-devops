@@ -19,7 +19,7 @@ if __name__ == "__main__":
     completed_count = len(completed_tasks)
     employee_name = user.get("name")
 
-    print("Employee {} is done with tasks ({}/{}):".format(
+    print("Employee {} is done with tasks({}/{}):".format(
         employee_name, completed_count, total_tasks))
 
     for task in completed_tasks:
