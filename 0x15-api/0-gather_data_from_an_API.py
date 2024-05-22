@@ -17,10 +17,10 @@ if __name__ == "__main__":
     completed_tasks = [todo for todo in todos if todo["completed"]]
     total_tasks = len(todos)
     completed_count = len(completed_tasks)
-    employee_name = todos[0]["userId"]
+    employee_name = user.get("name")
 
-    print(f"Employee {employee_name} is done with tasks"
-          "({completed_count}/{total_tasks}):")
+    print("Employee {} is done with tasks ({}/{}):".format(
+        employee_name, completed_count, total_tasks))
 
     for task in completed_tasks:
         print("\t {}".format(task['title']))
