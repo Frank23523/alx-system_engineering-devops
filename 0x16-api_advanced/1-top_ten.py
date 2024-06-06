@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """Top Ten"""
+
 import requests
+from sys import argv
 
 
 def top_ten(subreddit):
@@ -18,3 +20,7 @@ def top_ten(subreddit):
 
     for post in posts:
         print(post['data']['title'])
+
+
+if __name__ == "__main__":
+    top_ten(argv[1])
